@@ -1,22 +1,19 @@
 @extends('auth.layouts')
 
 @section('content')
-    _
     <div class="row justify-content-center mt-5">
         <div class="col-md-8">
             {{-- @if (isset($task)) {{ $task ? route('update') : route('add') }} @endif {{route('add')}} --}}
             <div class="card">
-                <div class="card-header">{{ $title }}</div>
+                <div class="card-header">{{ $task->id ? 'Edit Task' : 'Add Task'    }}</div>
                 <div class="card-body ">
-                    <form action="{{ url(!isset($task) ? '/add' : '/update') }}" method="post">
+                    <form action="{{ url($task ? '/add' : '/update') }}" method="post">
                         @csrf
                         <div class="mb-3 row">
                             <label for="Title" class="col-md-4 col-form-label text-md-end text-start">Title</label>
                             <div class="col-md-6">
-                                <input type="hidden" class="form-control " name="id" value="{{ $task->id ?? '' }}">
-
+                                <input type="hidden" class="form-control " name="id" value="{{ $task->id }}">
                                 <input type="text" class="form-control " name="title" value="{{ $task->title ?? '' }}">
-
                             </div>
                         </div>
                         <div class="mb-3 row">
@@ -47,7 +44,7 @@
                         </div>
                         <div class="mb-3 row">
                             <input type="submit" class="col-md-3 offset-md-5 btn btn-primary"
-                                value="{{ !isset($task) ? 'add' : 'Update' }} ">
+                                value="{{ ($task->id) ? 'Update' : 'Add' }} ">
                         </div>
                     </form>
                 </div>

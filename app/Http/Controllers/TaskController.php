@@ -24,40 +24,32 @@ class TaskController extends Controller
             return view('tasks.index', compact('tasks', 'title'));
         }
     }
-    public function form(Request $request)
-    {
-        if (request()->is('add')) {
-            $title = "Add Task ";
-            return view('tasks.form', compact('title'));
-            // show companies menu or something
-        } else {
-            $title = "Edit Task ";
+
+    public function edit(Request $request) {
+        if ($request->id) {
             $task = Task::find($request->id);
-
-            return view('tasks.form', compact('task', 'title'));
+        } else {
+            $task = new Task;
         }
+        return view('tasks.edit', compact('task'));
     }
 
-    public function add(Request $request)
+    public function store(Request $request)
     {
-        $user = Auth::user();
-        $task = new Task;
-        $task->title = $request->title;
-        $task->description = $request->description;
-        $task->status = $request->status;
-        $task->user_id = $user->id; 
-        $task->save();
-        return redirect('/index');
-    }
-    public function update(Request $request)
-    {
-        $task = Task::find($request->id);
+        if ($request->id) {     
+            $task = Task::find($request->id);
+        } else {
+            $user = Auth::user();
+            $task = new Task;
+            $task->user_id = $user->id; 
+        }
         $task->title = $request->title;
         $task->description = $request->description;
         $task->status = $request->status;
         $task->save();
         return redirect('index');
     }
+
     public function delete(Request $request)
     {
         Task::find($request->id)->delete();

@@ -37,11 +37,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/logout', [AuthController::class, 'logout']);
     Route::controller(TaskController::class)->group(function () {
         Route::get('index', 'index');
-        Route::get('add', 'form');
-        Route::post('add', 'add')->name('add');
-        Route::get('edit', 'form');
+        Route::get('add', 'edit');
+        Route::post('add', 'store')->name('add');
+        Route::get('edit', 'edit');
         Route::get('delete', 'delete');
-        Route::post('update', 'update')->name('update');
+        Route::post('update', 'store')->name('update');
         Route::get('detail', 'detail');
         Route::post('changestatus', 'chnageStatus'); //changestatus
         Route::post('comment/post', 'postComment');
