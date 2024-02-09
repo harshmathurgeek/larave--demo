@@ -22,19 +22,22 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               @guest
               <li class="nav-item">
+                <a class="nav-link {{ (request()->is('login')) ? 'active' : '' }}" href="{{ url('public') }}">Tasks</a>
+             </li>
+              <li class="nav-item">
                   <a class="nav-link {{ (request()->is('login')) ? 'active' : '' }}" href="{{ url('login') }}">Login</a>
               </li>
               <li class="nav-item">
                   <a class="nav-link {{ (request()->is('register')) ? 'active' : '' }}" href="{{ url('register') }}">Register</a>
               </li>
           @else    
-              <a class="navbar-brand" href="{{ URL('/task/my-task') }}"> Welcome <b>{{ Auth::user()->name }} </b></a>
+              <a class="navbar-brand" href="{{ URL('index') }}"> Welcome <b>{{ Auth::user()->name }} </b></a>
               <li class="nav-item">
-                <a class="nav-link" href="{{ url('/task/my-task') }}">MyTask</a>
+                <a class="nav-link" href="{{ url('index') }}">MyTask</a>
               </li>
 
               <li class="nav-item">
-                <a class="nav-link" href="{{ url('/task/show') }}">PublicTask</a>
+                <a class="nav-link" href="{{ url('public') }}">PublicTask</a>
               </li>
 
               <li class="nav-item   ">

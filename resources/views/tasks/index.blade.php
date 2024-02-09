@@ -1,61 +1,74 @@
 @extends('auth.layouts')
-
 @section('content')
-    _
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-8">
-            {{-- @if (isset($task)) {{ $task ? route('update') : route('add') }} @endif {{route('add')}} --}}
-            <div class="card">
-                <div class="card-header">{{ $title }}</div>
-                <div class="card-body ">
-                    <form action="{{ url(!isset($task) ? '/task/add' : '/task/update') }}" method="post">
-                        @csrf
-                        <div class="mb-3 row">
-                            <label for="Title" class="col-md-4 col-form-label text-md-end text-start">Title</label>
-                            <div class="col-md-6">
-                                <input type="hidden" class="form-control " name="id" value="{{ $task->id ?? '' }}">
+    <center>
+        <h3>{{ $title }}</h3>
+    </center>
+    <table id="myTable" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th class="col">ID</th>
+                <th class="col">Title</th>
+                <th class="col">Description</th>
+                <th class="col">Status</th>
+                <th class="col">Owner</th>
+                <th class="col">Action </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($tasks as $task)
+                <tr>
+                    <td>{{ $task->id }}</td>
+                    <td>{{ $task->title }}</td>
+                    <td>{{ $task->description }}</td>
+                    <td>{{ $task->status }}</td>
+                    <td>{{ $task->user->name }}</td>
+                    @if ($title == 'Your Tasks')
+                        <td>
+                            <a href="edit?id={{ $task->id }} "class="btn btn btn-primary btn-xs dt-edit"> Edit</a>
 
-                                <input type="text" class="form-control " name="title" value="{{ $task->title ?? '' }}">
+                            <a onclick="showAlert()"
+                                href="delete?id={{ $task->id }} "class="btn btn btn-danger btn-xs dt-delete"> delete</a>
 
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="description" class="col-md-4 col-form-label text-md-end text-start">description
-                            </label>
-                            <div class="col-md-6">
-                                <input type="text" class="form-control " name="desce" value="{{ $task->desce ?? '' }}">
-                            </div>
+                            <input class="mx-2 form-check-input" name="id" onchange="toggleChange(this)"
+                                value="{{ $task->id }}" type="checkbox"
+                                @if ($task->public) checked @endif>
+                            <label class="form-check-label" for="inlineCheckbox1">public</label>
+                        </td>
+                    @else
+                        <td><a class="btn btn btn-primary btn-xs dt-edit" href="detail/?id={{ $task->id }}">View Task</a></td>
+                    @endif
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+    @if ($title == 'Your Tasks')
+        <center><a href="add" class="btn btn-success">Add Task</a> </center>
+    @endif
+@endsection
+@section('scripts')
+    <script>
+        $(document).ready(function() {
+            var table = $('#myTable').DataTable();
+        });
 
+        function showAlert() {
+            alert("Are You Sure");
+        }
 
-                        </div>
+        function toggleChange(obj) {
+            console.log(obj.value);
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: '/changestatus',
+                data: `id=${obj.value}`,
+                type: 'POST',
+                success: function(result) {
 
-
-                        <div class="mb-3  d-flex justify-content-center">
-                            <div class="form-check mx-3 ">
-                                <label class="form-check-label " for="flexRadioDefault1">
-                                    Pending
-                                </label>
-                                <input class="form-check-input" type="radio" name="status" id="flexRadioDefault1"
-                                    value="pending"
-                                    @if (isset($task)) {{ $task->status == 'pending' ? 'checked' : '' }} @endif>
-                            </div>
-                            <div class="form-check mx-3">
-                                <label class="form-check-label" for="flexRadioDefault2">
-                                    Completed
-                                </label>
-                                <input class="form-check-input" type="radio" name="status" id="flexRadioDefault2"
-                                    value="Completed"
-                                    @if (isset($task)) {{ $task->status == 'Completed' ? 'checked' : '' }} @endif>
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <input type="submit" class="col-md-3 offset-md-5 btn btn-primary"
-                                value="{{ !isset($task) ? 'add' : 'Update' }} ">
-                        </div>
-
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+                    console.log("===== " + result + " =====");
+                }
+            });
+        }
+    </script>
 @endsection

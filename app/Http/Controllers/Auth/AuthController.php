@@ -1,17 +1,14 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
-
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-
-
 class AuthController extends Controller
 {
-    public function indexLogin(Request $request)
+    public function indexLogin()
     {
         return view('auth.login');
     }
@@ -19,19 +16,18 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         if (Auth::attempt($request->only('email', 'password'))) {
-            return redirect('/task/my-task');
+            return redirect('index');
         }
-
         return back()->withErrors(['email' => 'Your provided credentials do not match in our records.']);
     }
 
     public function logout()
     {
         Auth::logout();
-        return redirect('login');
+        return redirect('public');
     }
 
-    public function indexRegister(Request $request)
+    public function indexRegister()
     {
         return view('auth.register');
     }
@@ -48,10 +44,7 @@ class AuthController extends Controller
             'password' => Hash::make($request->password)
         ]);
         Auth::attempt($request->only('email', 'password'));
-        return redirect('dashboard');
+        return redirect('index');
     }
-    public function dashboard(Request $request)
-    {
-        return view('auth.dashboard');
-    }
+    
 }

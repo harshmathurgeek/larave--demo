@@ -14,29 +14,38 @@ use App\Http\Controllers\TaskController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::controller(AuthController::class)->group(function () {
+    Route::get('/logout', 'logout');
+    Route::group(['middleware' => 'guest'], function () {
+        Route::get('/login', 'indexLogin');
+        Route::post('/login', 'login')->name("login");
+        Route::get('/register', 'indexRegister');
+        Route::post('/register', 'register')->name("register");
+    });
 });
 Route::group(['middleware' => 'guest'], function () {
-
-    Route::get('/login', [authController::class, ('indexLogin')])->name("login");
-    Route::post('/login', [authController::class, 'login'])->name("login");
-    Route::get('/register', [authController::class, ('indexRegister')])->name("register");
-    Route::post('/register', [authController::class, ('register')])->name("register");
+    Route::controller(AuthController::class)->group(function () {
+        Route::get('/login', 'indexLogin');
+        Route::post('/login', 'login')->name("login");
+        Route::get('/register', 'indexRegister');
+        Route::post('/register', 'register')->name("register");
+    });
 });
-Route::get('/task/show', [TaskController::class, ('show')])->name('show-task');
-Route::get('/task/detail', [TaskController::class, ('detail')])->name('detail-task');
 
-//make group
+//auth routes 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/logout', [AuthController::class, 'logout']);
-    Route::get('/dashboard',[AuthController::class, ('dashboard')]);
-    Route::get('task/add', [TaskController::class, ('index')]);
-    Route::post('/task/add', [TaskController::class, ('add')])->name('add');
-    Route::get('/task/edit', [TaskController::class, ('index')]);
-    Route::get('/task/delete', [TaskController::class, ('delete')]);
-    Route::post('/task/update', [TaskController::class, ('update')])->name('update');
-    Route::get('/task/my-task', [TaskController::class, ('myTask')]);
-    Route::post('/make-public', [TaskController::class, ('makePublic')]); //changestatus
-    Route::post('/comment/post', [TaskController::class, ('postComment')]);
+    Route::controller(TaskController::class)->group(function () {
+        Route::get('index', 'index');
+        Route::get('add', 'form');
+        Route::post('add', 'add')->name('add');
+        Route::get('edit', 'form');
+        Route::get('delete', 'delete');
+        Route::post('update', 'update')->name('update');
+        Route::get('detail', 'detail');
+        Route::post('changestatus', 'chnageStatus'); //changestatus
+        Route::post('comment/post', 'postComment');
+    });
 });
+//public routes
+Route::get('/public', [TaskController::class, 'index']);

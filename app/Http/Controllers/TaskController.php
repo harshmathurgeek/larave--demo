@@ -13,15 +13,28 @@ class TaskController extends Controller
     //tasks
     public function index(Request $request)
     {
+        if (request()->is('index')) {
+            $user = Auth::user();
+            $tasks = Task::where('user_id', '=', $user->id)->get();
+            $title = "Your Tasks";
+            return view('tasks.index', compact('tasks', 'title'));
+        } else {
+            $tasks = Task::where('public', '=', '1')->get();
+            $title = "Public Tasks";
+            return view('tasks.index', compact('tasks', 'title'));
+        }
+    }
+    public function form(Request $request)
+    {
         if (request()->is('add')) {
             $title = "Add Task ";
-            return view('tasks.index', compact('title'));
+            return view('tasks.form', compact('title'));
             // show companies menu or something
         } else {
             $title = "Edit Task ";
             $task = Task::find($request->id);
 
-            return view('tasks.index', compact('task', 'title'));
+            return view('tasks.form', compact('task', 'title'));
         }
     }
 
@@ -30,44 +43,32 @@ class TaskController extends Controller
         $user = Auth::user();
         $task = new Task;
         $task->title = $request->title;
-        $task->desce = $request->desce;
+        $task->description = $request->description;
         $task->status = $request->status;
-        $task->user_id = $user->id; //use id   // use User_id as parameter
+        $task->user_id = $user->id; 
         $task->save();
-        return redirect('/task/my-task');
+        return redirect('/index');
     }
-    public function show(Request $request)
-    {
-        $tasks = Task::where('public', '=', '1')->get();
-        return view('tasks.show', compact('tasks'));
-    }
-
     public function update(Request $request)
     {
         $task = Task::find($request->id);
         $task->title = $request->title;
-        $task->desce = $request->desce;
+        $task->description = $request->description;
         $task->status = $request->status;
         $task->save();
-        return redirect('/task/my-task');
+        return redirect('index');
     }
     public function delete(Request $request)
     {
         Task::find($request->id)->delete();
-        return redirect('/task/my-task');
+        return redirect('index');
     }
     public function detail(Request $request)
     {
         $task = Task::find($request->id);
         return view('tasks.detail', compact('task'));
     }
-    public function myTask(Request $request)
-    {
-        $user = Auth::user();
-        $tasks = Task::where('user_id', '=', $user->id)->get();
-        return view('tasks.personal', compact('tasks'));
-    }
-    public function makePublic(Request $request)
+    public function chnageStatus(Request $request)
     {
         $task = Task::find($request->id);
         if ($task->public) {
@@ -76,9 +77,8 @@ class TaskController extends Controller
             $task->public = 1;
         }
         $task->save();
-        return redirect('/task/my-task');
+        return redirect('index');
     }
-
     public function postComment(Request $request)
     {
         $comment = new Comment();
@@ -86,6 +86,10 @@ class TaskController extends Controller
         $comment->task_id = $request->task_id;
         $comment->user_id = Auth::user()->id;
         $comment->save();
-        return redirect('/task/detail/?id=' . $request->task_id); //follow nested routing
+        return redirect('detail/?id=' . $request->task_id); //follow nested routing
+    }
+    public function test()
+    {
+        return view('tasks.testIndex');
     }
 }
